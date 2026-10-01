@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FitBuddy – AI Fitness Plan Generator</title>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --text: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #10b981;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            color: #ffffff;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-bottom: 24px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.9rem;
+            margin-bottom: 6px;
+            color: var(--text-muted);
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            background-color: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 6px;
+            color: var(--text);
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background-color: #4338ca;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .metric-box {
+            background-color: #0f172a;
+            padding: 16px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #334155;
+        }
+
+        .metric-val {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--accent);
+        }
+
+        .panels-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .panel-card {
+            background-color: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            overflow: hidden;
+            padding: 12px;
+        }
+
+        .panel-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 6px;
+            margin-bottom: 10px;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            background: #334155;
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>💪 FitBuddy: AI Fitness & Diet Plan Generator</h1>
+        <p class="subtitle">AI-Powered Personalized Workout & Nutrition Planner</p>
+    </header>
+
+    <div class="card">
+        <div class="grid">
+            <div>
+                <label>Age</label>
+                <input type="number" id="age" value="22" min="15" max="80">
+            </div>
+            <div>
+                <label>Gender</label>
+                <select id="gender">
+                    <option>Male</option>
+                    <option>Female</option>
+                    <option>Other</option>
+                </select>
+            </div>
+            <div>
+                <label>Height (cm)</label>
+                <input type="number" id="height" value="170">
+            </div>
+            <div>
+                <label>Weight (kg)</label>
+                <input type="number" id="weight" value="68">
+            </div>
+        </div>
+
+        <div class="grid">
+            <div>
+                <label>Fitness Goal</label>
+                <select id="goal">
+                    <option value="fat_loss">Weight Loss & Fat Burn</option>
+                    <option value="muscle">Muscle Building & Hypertrophy</option>
+                    <option value="stamina">Cardio & Endurance</option>
+                </select>
+            </div>
+            <div>
+                <label>Dietary Preference</label>
+                <select id="diet">
+                    <option>Standard / Balanced</option>
+                    <option>Vegetarian</option>
+                    <option>High-Protein Non-Veg</option>
+                    <option>Vegan</option>
+                </select>
+            </div>
+        </div>
+
+        <button onclick="generatePlan()">⚡ Generate My AI Fitness & Diet Plan</button>
+    </div>
+
+    <div id="results" class="hidden">
+        <div class="card">
+            <h2>📊 Assessment & Metrics</h2>
+            <div class="metrics-grid">
+                <div class="metric-box">
+                    <div>Calculated BMI</div>
+                    <div id="bmi-val" class="metric-val">--</div>
+                </div>
+                <div class="metric-box">
+                    <div>Category</div>
+                    <div id="bmi-cat" class="metric-val" style="font-size: 1.1rem; color: #f8fafc;">--</div>
+                </div>
+                <div class="metric-box">
+                    <div>Target Goal</div>
+                    <div id="target-summary" class="metric-val" style="font-size: 1.1rem;">--</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>🏋️ 7-Day Workout Routine (Visual Guide)</h2>
+            <div id="workout-panels" class="panels-grid"></div>
+        </div>
+
+        <div class="card">
+            <h2>🥗 Nutritional Meal Blueprint</h2>
+            <div class="grid" id="diet-plan"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+function generatePlan() {
+    const weight = parseFloat(document.getElementById('weight').value);
+    const height = parseFloat(document.getElementById('height').value);
+    const goal = document.getElementById('goal').value;
+    const diet = document.getElementById('diet').value;
+
+    const heightM = height / 100;
+    const bmi = (weight / (heightM * heightM)).toFixed(1);
+
+    let cat = "Normal Weight";
+    if (bmi < 18.5) cat = "Underweight";
+    else if (bmi >= 25 && bmi < 29.9) cat = "Overweight";
+    else if (bmi >= 30) cat = "Obese";
+
+    document.getElementById('bmi-val').innerText = bmi;
+    document.getElementById('bmi-cat').innerText = cat;
+    document.getElementById('target-summary').innerText = document.getElementById('goal').selectedOptions[0].text.split('&')[0];
+
+    const routines = {
+        fat_loss: [
+            { day: "Day 1: Full-Body HIIT", desc: "Jumping Jacks, Burpees, Mountain Climbers (4 rounds)", prompt: "hiit fitness workout gym athletic" },
+            { day: "Day 2: Cardio & Legs", desc: "Bodyweight Squats, Walking Lunges, 25-min jog", prompt: "running outdoors fitness track" },
+            { day: "Day 3: Upper Body & Core", desc: "Push-ups, Dumbbell rows, Plank holds", prompt: "pushups athletic workout" },
+            { day: "Day 4: Core & Mobility", desc: "Bicycle crunches, stretching, yoga flow", prompt: "yoga stretch fitness exercise" }
+        ],
+        muscle: [
+            { day: "Day 1: Chest & Triceps", desc: "Bench Press, Dumbbell Incline Press, Dips", prompt: "chest dumbbell bench press gym" },
+            { day: "Day 2: Back & Biceps", desc: "Pull-ups, Lat Pulldowns, Barbell Rows", prompt: "pullups bodybuilding gym" },
+            { day: "Day 3: Legs & Core", desc: "Barbell Squats, Romanian Deadlifts, Leg Press", prompt: "squats gym leg workout" },
+            { day: "Day 4: Shoulders & Arms", desc: "Overhead Shoulder Press, Lateral Raises, Curls", prompt: "dumbbell shoulder press workout" }
+        ],
+        stamina: [
+            { day: "Day 1: Tempo Run", desc: "5km paced running and cadence drills", prompt: "running marathon fitness outdoor" },
+            { day: "Day 2: Circuit Training", desc: "Kettlebell swings, box jumps, rowing", prompt: "crossfit circuit training gym" },
+            { day: "Day 3: Recovery Swim", desc: "30-min steady endurance laps", prompt: "swimming pool athlete endurance" },
+            { day: "Day 4: Functional Core", desc: "Hanging leg raises, plank variations", prompt: "core workout calisthenics" }
+        ]
+    };
+
+    const selectedRoutines = routines[goal] || routines.fat_loss;
+    const panelsContainer = document.getElementById('workout-panels');
+    panelsContainer.innerHTML = '';
+
+    selectedRoutines.forEach(item => {
+        const encodedPrompt = encodeURIComponent(item.prompt + ", athletic photography, sharp");
+        const imgUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=500&height=300&nologo=true`;
+        
+        panelsContainer.innerHTML += `
+            <div class="panel-card">
+                <img src="${imgUrl}" alt="${item.day}" loading="lazy">
+                <span class="tag">AI Visual Guide</span>
+                <h3>${item.day}</h3>
+                <p style="color: var(--text-muted); font-size: 0.95rem;">${item.desc}</p>
+            </div>
+        `;
+    });
+
+    const dietContainer = document.getElementById('diet-plan');
+    dietContainer.innerHTML = `
+        <div style="background:#0f172a; padding:16px; border-radius:8px;">
+            <h4>🍳 Breakfast</h4>
+            <p style="color:var(--text-muted);">Oatmeal with nuts & fruits OR Scrambled eggs/tofu with spinach. Green tea.</p>
+        </div>
+        <div style="background:#0f172a; padding:16px; border-radius:8px;">
+            <h4>🥗 Lunch</h4>
+            <p style="color:var(--text-muted);">Grilled protein bowl (${diet}), brown rice or chapati with fresh vegetables.</p>
+        </div>
+        <div style="background:#0f172a; padding:16px; border-radius:8px;">
+            <h4>🍎 Evening Snack</h4>
+            <p style="color:var(--text-muted);">Roasted almonds, walnuts, or an apple with peanut butter.</p>
+        </div>
+        <div style="background:#0f172a; padding:16px; border-radius:8px;">
+            <h4>🍲 Dinner</h4>
+            <p style="color:var(--text-muted);">Steamed greens, vegetable soup, and lean protein. Low carb balance.</p>
+        </div>
+    `;
+
+    document.getElementById('results').classList.remove('hidden');
+    document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+}
+</script>
+
+</body>
+</html>
